@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico de Cultura | CQE</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Montserrat',sans-serif;background:#083D41;min-height:100vh;color:#F5EDE4}
+.wrap{max-width:600px;margin:0 auto;padding:32px 16px}
+.card{background:#0C4540;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4)}
+
+/* HERO */
+.hero{background:#0C4540;padding:48px 28px 36px;text-align:center;border-bottom:3px solid transparent;background-clip:padding-box;position:relative}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#E8714A,transparent)}
+.badge{font-size:10px;letter-spacing:3px;color:#E8714A;text-transform:uppercase;font-weight:600;margin-bottom:16px;display:block}
+.hero h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#F5EDE4;line-height:1.3;margin-bottom:12px}
+.hero h1 span{color:#E8714A}
+.hero p{font-size:13px;color:rgba(245,237,228,0.65);line-height:1.7;margin-bottom:24px}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 20px}
+.leg{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(245,237,228,0.55)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+
+/* BODY */
+.body{background:#F5EDE4;padding:28px 24px 40px}
+
+/* PROGRESS */
+.prog-wrap{margin-bottom:26px}
+.prog-labels{display:flex;justify-content:space-between;font-size:10px;color:#0C4540;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;opacity:0.55}
+.prog-track{height:3px;background:rgba(12,69,64,0.15);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:#E8714A;border-radius:2px;transition:width 0.4s ease;width:0%}
+
+/* QUESTIONS */
+.qblock{display:none}
+.qblock.on{display:block}
+.qcat{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#E8714A;font-weight:600;margin-bottom:8px}
+.qtxt{font-family:'Playfair Display',serif;font-size:20px;color:#0C4540;line-height:1.4;margin-bottom:20px;font-weight:700}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{background:white;border:1.5px solid rgba(12,69,64,0.15);border-radius:10px;padding:13px 15px;text-align:left;cursor:pointer;transition:all 0.18s;display:flex;align-items:flex-start;gap:11px;font-family:'Montserrat',sans-serif;width:100%}
+.opt:hover{border-color:#0C4540;background:rgba(12,69,64,0.04)}
+.opt.sel{border-color:#E8714A;background:rgba(232,113,74,0.06)}
+.onum{width:24px;height:24px;border-radius:50%;background:rgba(12,69,64,0.08);font-size:11px;font-weight:700;color:#0C4540;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.opt.sel .onum{background:#E8714A;color:white}
+.otxt{font-size:13px;color:#333;line-height:1.5}
+
+/* NAV */
+.nav{display:flex;gap:10px;margin-top:24px}
+.btn{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:12px 20px;border-radius:8px;cursor:pointer;border:none;transition:all 0.2s}
+.btn-back{background:transparent;color:rgba(12,69,64,0.5);border:1.5px solid rgba(12,69,64,0.2)}
+.btn-next{background:#0C4540;color:#F5EDE4;flex:1}
+.btn-next:hover{background:#0a3835}
+.btn-next:disabled{opacity:0.35;cursor:not-allowed}
+
+/* CAPTURE */
+.cap-section{display:none}
+.cap-header{background:#0C4540;padding:40px 28px 32px;text-align:center;position:relative}
+.cap-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#E8714A,transparent)}
+.cap-eye{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#E8714A;font-weight:600;margin-bottom:10px;display:block}
+.cap-header h2{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#F5EDE4;line-height:1.3;margin-bottom:10px}
+.cap-header h2 span{color:#E8714A}
+.cap-header p{font-size:13px;color:rgba(245,237,228,0.6);line-height:1.7}
+.cap-body{background:#F5EDE4;padding:28px 24px 40px}
+.cap-sub{text-align:center;margin-bottom:24px}
+.cap-sub h3{font-family:'Playfair Display',serif;font-size:20px;color:#0C4540;font-weight:700;margin-bottom:6px}
+.cap-sub p{font-size:12px;color:rgba(12,69,64,0.55);line-height:1.6}
+.fgroup{margin-bottom:14px}
+.flabel{display:block;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#0C4540;opacity:0.6;margin-bottom:6px}
+.finput{width:100%;padding:12px 14px;border:1.5px solid rgba(12,69,64,0.2);border-radius:9px;font-family:'Montserrat',sans-serif;font-size:14px;color:#0C4540;background:white;outline:none;transition:border-color 0.2s}
+.finput:focus{border-color:#0C4540}
+.finput::placeholder{color:rgba(12,69,64,0.3)}
+.btn-submit{width:100%;background:#E8714A;color:white;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:14px;border-radius:9px;border:none;cursor:pointer;transition:background 0.2s;margin-top:6px}
+.btn-submit:hover{background:#d4613b}
+.btn-submit:disabled{opacity:0.5;cursor:not-allowed}
+.privacy{font-size:11px;color:rgba(12,69,64,0.4);text-align:center;margin-top:12px;line-height:1.6}
+
+/* RESULT */
+.res-section{display:none}
+.res-header{background:#0C4540;padding:40px 28px 32px;text-align:center}
+.ring-wrap{position:relative;width:130px;height:130px;margin:0 auto 18px}
+.ring-wrap svg{width:130px;height:130px}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.score-n{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:#F5EDE4;line-height:1}
+.score-m{font-size:11px;color:rgba(245,237,228,0.45);margin-top:2px}
+.res-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#E8714A;font-weight:600;margin-bottom:8px}
+.res-ttl{font-family:'Playfair Display',serif;font-size:21px;color:#F5EDE4;font-weight:700;line-height:1.3}
+.res-body{background:#F5EDE4;padding:28px 24px 40px}
+.res-desc{font-size:13px;color:#333;line-height:1.8;margin-bottom:24px;padding:16px;background:white;border-radius:10px;border-left:3px solid #E8714A}
+.dim-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#0C4540;font-weight:700;margin-bottom:14px;opacity:0.55}
+.dim-bars{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.dim-row-labels{display:flex;justify-content:space-between;font-size:12px;color:#0C4540;font-weight:600;margin-bottom:5px}
+.dim-track{height:6px;background:rgba(12,69,64,0.1);border-radius:3px;overflow:hidden}
+.dim-fill{height:100%;border-radius:3px;background:#0C4540;width:0%;transition:width 0.8s ease}
+.cta-box{background:#0C4540;border-radius:14px;padding:24px;text-align:center}
+.cta-eye{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#E8714A;font-weight:600;margin-bottom:8px}
+.cta-ttl{font-family:'Playfair Display',serif;font-size:18px;color:#F5EDE4;font-weight:700;margin-bottom:8px;line-height:1.35}
+.cta-sub{font-size:12px;color:rgba(245,237,228,0.6);line-height:1.65;margin-bottom:20px}
+.cta-btn{display:block;width:100%;background:#E8714A;color:white;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:14px;border-radius:9px;border:none;cursor:pointer;text-decoration:none;text-align:center;transition:background 0.2s}
+.cta-btn:hover{background:#d4613b}
+.restart{display:block;text-align:center;margin-top:16px;font-size:11px;color:rgba(12,69,64,0.4);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:'Montserrat',sans-serif}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="hero">
+    <span class="badge">CQE · Cultura que Executa</span>
+    <h1>Sua cultura realmente <span>executa?</span></h1>
+    <p>8 perguntas. 5 minutos. Um score real sobre a maturidade cultural da sua empresa — sem rodeios.</p>
+    <div class="legend">
+      <div class="leg"><span class="dot" style="background:#ef4444"></span>Não existe</div>
+      <div class="leg"><span class="dot" style="background:#f97316"></span>Só no discurso</div>
+      <div class="leg"><span class="dot" style="background:#eab308"></span>Parcialmente</div>
+      <div class="leg"><span class="dot" style="background:#22c55e"></span>Consistente</div>
+    </div>
+  </div>
+  <div class="body">
+    <div class="prog-wrap">
+      <div class="prog-labels"><span id="plabel">Pergunta 1 de 8</span><span id="ppct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill" id="pfill"></div></div>
+    </div>
+    <div id="qcontainer"></div>
+    <div class="nav">
+      <button class="btn btn-back" id="btnback" style="display:none" onclick="goBack()">← Voltar</button>
+      <button class="btn btn-next" id="btnnext" disabled onclick="goNext()">Próxima →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAPTURA -->
+<div class="cap-section" id="capture">
+  <div class="cap-header">
+    <span class="cap-eye">Quase lá</span>
+    <h2>Seu diagnóstico está <span>pronto.</span></h2>
+    <p>Preencha seus dados para ver o resultado completo com score e análise por dimensão.</p>
+  </div>
+  <div class="cap-body">
+    <div class="cap-sub">
+      <h3>Para quem enviamos sua análise?</h3>
+      <p>Seus dados não serão compartilhados com terceiros.</p>
+    </div>
+    <div class="fgroup">
+      <label class="flabel">Seu nome</label>
+      <input class="finput" type="text" id="fnome" placeholder="Como você se chama?">
+    </div>
+    <div class="fgroup">
+      <label class="flabel">E-mail</label>
+      <input class="finput" type="email" id="femail" placeholder="seu@email.com.br">
+    </div>
+    <div class="fgroup">
+      <label class="flabel">WhatsApp</label>
+      <input class="finput" type="tel" id="ftel" placeholder="(00) 00000-0000">
+    </div>
+    <button class="btn-submit" id="btnsubmit" onclick="submitForm()">Ver meu resultado →</button>
+    <p class="privacy">🔒 Usado apenas pela equipe CQE. Sem spam.</p>
+  </div>
+</div>
+
+<!-- RESULTADO -->
+<div class="res-section" id="result">
+  <div class="res-header">
+    <div class="ring-wrap">
+      <svg viewBox="0 0 130 130" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="65" cy="65" r="54" fill="none" stroke="rgba(245,237,228,0.1)" stroke-width="10"/>
+        <circle cx="65" cy="65" r="54" fill="none" stroke="#E8714A" stroke-width="10"
+          stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="339.3"
+          transform="rotate(-90 65 65)" id="arc"/>
+      </svg>
+      <div class="ring-center">
+        <div class="score-n" id="scorenum">—</div>
+        <div class="score-m">de 24</div>
+      </div>
+    </div>
+    <div class="res-lbl" id="reslbl">Diagnóstico Concluído</div>
+    <div class="res-ttl" id="resttl">—</div>
+  </div>
+  <div class="res-body">
+    <div class="res-desc" id="resdesc">—</div>
+    <div class="dim-lbl">Score por dimensão</div>
+    <div class="dim-bars" id="dimbars"></div>
+    <div class="cta-box">
+      <div class="cta-eye">Próximo passo</div>
+      <div class="cta-ttl" id="ctattl">—</div>
+      <div class="cta-sub" id="ctasub">—</div>
+      <a class="cta-btn" href="https://wa.me/5571988607884?text=Ol%C3%A1!+Fiz+o+diagn%C3%B3stico+demo+da+CQE+e+gostaria+de+saber+mais." target="_blank">Fale com o nosso time para saber mais →</a>
+    </div>
+    <button class="restart" onclick="restart()">Refazer diagnóstico</button>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+var SHEET_URL="https://script.google.com/macros/s/AKfycby6boqdD0mkJDKTI7oSK41KF96_gsWPOGxFeSRm2LqUEELSVVLxQandfqVAhKjrHb7d/exec";
+var Q=[
+  {c:"Clareza Cultural",d:0,t:"As pessoas da sua empresa sabem, na prática, o que é esperado delas no dia a dia?",o:[
+    {l:"Não existe clareza. Cada um interpreta do seu jeito.",s:0},
+    {l:"Existe um discurso, mas ele não se traduz em comportamentos concretos.",s:1},
+    {l:"Parte do time entende, mas há inconsistência entre áreas.",s:2},
+    {l:"Sim. Há critérios claros e as pessoas conseguem tomar decisões com base neles.",s:3}
+  ]},
+  {c:"Clareza Cultural",d:0,t:"Quando surge um dilema real — pressão por resultado vs. valor cultural — o que prevalece?",o:[
+    {l:"O resultado prevalece. Valores ficam para depois.",s:0},
+    {l:"Depende muito de quem está conduzindo a decisão.",s:1},
+    {l:"Há esforço para equilibrar, mas sem critérios definidos.",s:2},
+    {l:"Existe um critério claro que orienta a decisão mesmo sob pressão.",s:3}
+  ]},
+  {c:"Liderança Executora",d:1,t:"Os líderes da sua empresa cobram comportamentos ou apenas resultados?",o:[
+    {l:"Só resultado importa. Como se chega lá, não é discutido.",s:0},
+    {l:"Há discurso sobre comportamento, mas a cobrança real é só por número.",s:1},
+    {l:"Alguns líderes cobram comportamento, outros não. Há inconsistência.",s:2},
+    {l:"A liderança cobra resultado e como ele é gerado, de forma consistente.",s:3}
+  ]},
+  {c:"Liderança Executora",d:1,t:"Quando um líder age de forma incoerente com a cultura, o que acontece?",o:[
+    {l:"Nada. Isso é aceito ou ignorado.",s:0},
+    {l:"Há desconforto, mas sem consequência formal.",s:1},
+    {l:"Às vezes é abordado, dependendo do líder e da situação.",s:2},
+    {l:"Existe um mecanismo claro para endereçar isso com consequência.",s:3}
+  ]},
+  {c:"Execução no Dia a Dia",d:2,t:"Promoções na sua empresa seguem critérios culturais claros ou são baseadas em impressão e tempo de casa?",o:[
+    {l:"Impressão e relacionamento definem quem sobe.",s:0},
+    {l:"Há critérios formais, mas na prática a subjetividade domina.",s:1},
+    {l:"Existe algum critério cultural, mas não é aplicado de forma consistente.",s:2},
+    {l:"Promoções seguem critérios comportamentais e culturais explícitos.",s:3}
+  ]},
+  {c:"Execução no Dia a Dia",d:2,t:"Em que medida a cultura aparece nas reuniões e decisões cotidianas da empresa?",o:[
+    {l:"Não aparece. Reuniões são operacionais, sem conexão com cultura.",s:0},
+    {l:"É citada ocasionalmente, mas não guia as decisões.",s:1},
+    {l:"Em algumas reuniões e contextos sim, mas de forma irregular.",s:2},
+    {l:"A cultura é referência concreta nas decisões e rituais de gestão.",s:3}
+  ]},
+  {c:"Indicadores de Cultura",d:3,t:"Sua empresa mede, de alguma forma, se a cultura está sendo executada?",o:[
+    {l:"Não medimos nada relacionado a cultura.",s:0},
+    {l:"Fazemos pesquisa de clima, mas ela não gera ação concreta.",s:1},
+    {l:"Temos alguns indicadores, mas não são usados para decisão.",s:2},
+    {l:"Sim. Temos indicadores culturais que informam decisões estratégicas.",s:3}
+  ]},
+  {c:"Indicadores de Cultura",d:3,t:"Se você tivesse que avaliar o nível de coerência cultural da sua empresa hoje, qual seria?",o:[
+    {l:"Discurso e prática são completamente desalinhados.",s:0},
+    {l:"Há mais incoerência do que coerência.",s:1},
+    {l:"Existem ilhas de coerência, mas o todo ainda é inconsistente.",s:2},
+    {l:"A cultura é vivida de forma coerente na maior parte da organização.",s:3}
+  ]}
+];
+var DIMS=["Clareza Cultural","Liderança Executora","Execução no Dia a Dia","Indicadores de Cultura"];
+var RES=[
+  {min:0,max:7,lbl:"Cultura em Risco",ttl:"A cultura não sustenta o crescimento",desc:"O diagnóstico indica desconexão crítica entre discurso e prática. A cultura existe apenas no papel — ela não influencia decisões, não organiza rotinas e não gera consequências. Sem intervenção estruturada, os custos invisíveis desse desalinhamento tendem a crescer: conflitos de liderança, perda de talentos e decisões inconsistentes. O risco é real.",ctattl:"Sua empresa precisa de um diagnóstico completo.",ctasub:"O DCE mapeia com precisão onde está a incoerência e o que precisa mudar primeiro. Vamos conversar?"},
+  {min:8,max:14,lbl:"Cultura em Construção",ttl:"Existe intenção, mas falta execução",desc:"Há esforço real — valores declarados, lideranças com algum alinhamento, iniciativas culturais. Mas a execução é irregular. A cultura aparece em alguns contextos e some em outros. Isso cria zonas de ambiguidade que geram ruído decisório, desgaste interno e inconsistência de performance. O potencial está lá. O sistema de execução ainda não.",ctattl:"Você está no momento certo para estruturar isso.",ctasub:"O DCE transforma essa intenção em sistema executável. A janela para agir com menor atrito é agora."},
+  {min:15,max:20,lbl:"Cultura em Maturação",ttl:"A cultura funciona — com lacunas que custam caro",desc:"Sua empresa tem uma cultura com bases sólidas. Há clareza, alguma coerência de liderança e rituais funcionando. Mas existem lacunas específicas que travam o próximo nível de crescimento — áreas sem alinhamento, indicadores ausentes ou decisões que ainda escapam da cultura. Chegar aqui foi difícil. Sustentar sem sistematizar é arriscado.",ctattl:"A diferença entre cultura boa e cultura executável é o sistema.",ctasub:"Um diagnóstico preciso revela exatamente onde investir para escalar com coerência."},
+  {min:21,max:24,lbl:"Cultura Executável",ttl:"Você tem o que poucos conseguem construir",desc:"Os resultados indicam alta maturidade cultural. A cultura influencia decisões, orienta liderança e aparece nas rotinas. Isso é raro — e valioso. O desafio agora é governança: como sustentar isso em escala, em crescimento, sob pressão. Cultura sem governança se deteriora silenciosamente.",ctattl:"Cultura forte precisa de governança para durar.",ctasub:"O DCE confirma seus pontos fortes e mapeia o que proteger antes que o crescimento dilua o que você construiu."}
+];
+var ans=new Array(8).fill(null),cur=0,scores={};
+
+function build(){
+  var c=document.getElementById('qcontainer');
+  Q.forEach(function(q,i){
+    var b=document.createElement('div');
+    b.className='qblock'+(i===0?' on':'');
+    b.id='q'+i;
+    b.innerHTML='<div class="qcat">'+q.c+'</div><div class="qtxt">'+q.t+'</div><div class="opts">'+
+      q.o.map(function(o,j){return'<button class="opt" onclick="pick('+i+','+j+','+o.s+')"><div class="onum">'+o.s+'</div><div class="otxt">'+o.l+'</div></button>';}).join('')+
+    '</div>';
+    c.appendChild(b);
+  });
+}
+
+function pick(qi,oi,s){
+  ans[qi]=s;
+  document.querySelectorAll('#q'+qi+' .opt').forEach(function(b,j){b.classList.toggle('sel',j===oi);});
+  document.getElementById('btnnext').disabled=false;
+}
+
+function prog(){
+  var p=Math.round((cur/8)*100);
+  document.getElementById('pfill').style.width=p+'%';
+  document.getElementById('ppct').textContent=p+'%';
+  document.getElementById('plabel').textContent='Pergunta '+(cur+1)+' de 8';
+  document.getElementById('btnback').style.display=cur>0?'block':'none';
+}
+
+function goNext(){
+  if(ans[cur]===null)return;
+  if(cur<7){
+    document.getElementById('q'+cur).classList.remove('on');
+    cur++;
+    document.getElementById('q'+cur).classList.add('on');
+    document.getElementById('btnnext').disabled=ans[cur]===null;
+    document.getElementById('btnnext').textContent=cur===7?'Ver Resultado →':'Próxima →';
+    prog();
+    window.scrollTo({top:0,behavior:'smooth'});
+  } else {
+    showCapture();
+  }
+}
+
+function goBack(){
+  if(cur>0){
+    document.getElementById('q'+cur).classList.remove('on');
+    cur--;
+    document.getElementById('q'+cur).classList.add('on');
+    document.getElementById('btnnext').disabled=false;
+    document.getElementById('btnnext').textContent=cur===7?'Ver Resultado →':'Próxima →';
+    prog();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+}
+
+function showCapture(){
+  var t=ans.reduce(function(a,b){return a+(b||0);},0);
+  var d=[0,0,0,0];
+  Q.forEach(function(q,i){d[q.d]+=(ans[i]||0);});
+  scores={total:t,dims:d};
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('capture').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function submitForm(){
+  var nome=document.getElementById('fnome').value.trim();
+  var email=document.getElementById('femail').value.trim();
+  var tel=document.getElementById('ftel').value.trim();
+  if(!nome||!email||!tel){alert('Por favor, preencha todos os campos.');return;}
+  var btn=document.getElementById('btnsubmit');
+  btn.disabled=true;btn.textContent='Enviando...';
+  fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({nome:nome,email:email,telefone:tel,score:scores.total,clareza:scores.dims[0],lideranca:scores.dims[1],execucao:scores.dims[2],indicadores:scores.dims[3]})
+  }).then(function(){showResult();}).catch(function(){showResult();});
+}
+
+function showResult(){
+  var t=scores.total,d=scores.dims;
+  var r=RES.filter(function(x){return t>=x.min&&t<=x.max;})[0];
+  document.getElementById('capture').style.display='none';
+  document.getElementById('result').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('scorenum').textContent=t;
+  document.getElementById('reslbl').textContent=r.lbl;
+  document.getElementById('resttl').textContent=r.ttl;
+  document.getElementById('resdesc').textContent=r.desc;
+  document.getElementById('ctattl').textContent=r.ctattl;
+  document.getElementById('ctasub').textContent=r.ctasub;
+  setTimeout(function(){
+    var arc=document.getElementById('arc');
+    arc.style.transition='stroke-dashoffset 1.2s ease';
+    arc.style.strokeDashoffset=339.3-((t/24)*339.3);
+  },200);
+  var bars=document.getElementById('dimbars');
+  bars.innerHTML='';
+  DIMS.forEach(function(name,i){
+    var s=d[i],p=Math.round((s/6)*100);
+    var div=document.createElement('div');
+    div.innerHTML='<div class="dim-row-labels"><span>'+name+'</span><span>'+s+'/6</span></div><div class="dim-track"><div class="dim-fill" id="df'+i+'"></div></div>';
+    bars.appendChild(div);
+    setTimeout(function(idx,pct){
+      var el=document.getElementById('df'+idx);
+      if(el){el.style.transition='width 0.9s ease '+(idx*0.15)+'s';el.style.width=pct+'%';}
+    }.bind(null,i,p),400);
+  });
+}
+
+function restart(){
+  ans=new Array(8).fill(null);cur=0;scores={};
+  document.getElementById('result').style.display='none';
+  document.getElementById('capture').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  document.querySelectorAll('.qblock').forEach(function(b,i){b.classList.toggle('on',i===0);});
+  document.querySelectorAll('.opt').forEach(function(b){b.classList.remove('sel');});
+  document.getElementById('btnnext').disabled=true;
+  document.getElementById('btnnext').textContent='Próxima →';
+  document.getElementById('btnback').style.display='none';
+  document.getElementById('pfill').style.width='0%';
+  document.getElementById('ppct').textContent='0%';
+  document.getElementById('plabel').textContent='Pergunta 1 de 8';
+  document.getElementById('fnome').value='';
+  document.getElementById('femail').value='';
+  document.getElementById('ftel').value='';
+  document.getElementById('btnsubmit').disabled=false;
+  document.getElementById('btnsubmit').textContent='Ver meu resultado →';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+build();
+</script>
+</body>
+</html>
